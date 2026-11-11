@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch documentation pages for tldr-docs. Stdlib only.
+"""Fetch documentation pages for the tldr skill. Stdlib only.
 
 Usage: fetch.py <bundle_dir> [--no-links] <url> [<url> ...]
 
@@ -18,7 +18,7 @@ from urllib.error import URLError
 from urllib.parse import urljoin, urlsplit
 from urllib.request import Request, urlopen
 
-UA = "tldr-docs/1.0 (documentation summarizer)"
+UA = "tldr/1.0 (documentation summarizer)"
 LANG = re.compile(r"^[a-z]{2}(?:[-_][A-Za-z]{2})?$")  # en, en-US, pt_BR
 LINK = re.compile(r"(?<!!)\[([^\]]*)\]\((https?://[^)\s]+)\)")
 HEAD = re.compile(r"^(#{1,3})\s+(\S.*)$")
