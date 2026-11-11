@@ -1,0 +1,75 @@
+{
+"title":"Claude Code Skills",
+"source_url":"https://code.claude.com/docs/en/skills",
+"fetched":"2026-11-11",
+"one_liner":"A skill is a folder containing SKILL.md. Its description decides when Claude loads it; its location decides who gets it.",
+"read_time_min":5,
+"core":[
+{"title":"A skill is a folder with a SKILL.md file","body":"`SKILL.md` holds YAML frontmatter (when to use the skill) and markdown instructions (what to do). The directory name, or frontmatter `name`, becomes the `/command`. Detailed material goes in supporting files that `SKILL.md` links to, so it loads only when needed.","why":"A short `SKILL.md` keeps context cost low; reference files and scripts carry the detail.",
+ "quotes":[{"text":"Every skill needs a `SKILL.md` file with two parts","url":"https://code.claude.com/docs/en/skills#create-your-first-skill","label":"Skills > Create your first skill"},{"text":"Keep `SKILL.md` under 500 lines. Move detailed reference material to separate files.","url":"https://code.claude.com/docs/en/skills#add-supporting-files","label":"Skills > Add supporting files"}],
+ "diagram":{"type":"tree","nodes":[{"label":"my-skill/","children":[{"label":"SKILL.md","note":"required"},{"label":"reference.md","note":"loaded when needed"},{"label":"scripts/","children":[{"label":"helper.py","note":"executed, not loaded"}]}]}],"caption":"Skill folder layout (from the docs example)"}},
+{"title":"The description is the trigger","body":"Claude reads the `description` of each skill and uses it to decide whether to load the full skill. Put the key use case first and include words users would naturally say.","why":"A vague description means the skill is not used automatically. Malformed YAML leaves the skill callable by `/name` but not matchable.",
+ "quotes":[{"text":"Claude uses this to decide when to apply the skill.","url":"https://code.claude.com/docs/en/skills#frontmatter-reference","label":"Skills > Frontmatter reference"},{"text":"Check the description includes keywords users would naturally say","url":"https://code.claude.com/docs/en/skills#skill-not-triggering","label":"Skills > Troubleshooting"}],
+ "diagram":{"type":"flow","nodes":["Descriptions listed in context","Request matches, or user types /name","Full SKILL.md enters conversation"],"caption":"Default behaviour: the description is always visible; the body loads only on invocation"}},
+{"title":"Location decides who gets the skill","body":"Personal skills (`~/.claude/skills/`) apply to all your projects; project skills (`.claude/skills/`) apply to one repository and can be committed. Enterprise, nested, plugin and claude.ai account locations also exist. On a name clash, enterprise beats personal, and personal beats project.","why":"Commit project skills to share them with the team; keep personal workflows in your home directory.",
+ "quotes":[{"text":"Where you save a skill decides which sessions load it.","url":"https://code.claude.com/docs/en/skills#choose-where-skills-load","label":"Skills > Choose where skills load"},{"text":"Enterprise over personal, and personal over project.","url":"https://code.claude.com/docs/en/skills#resolve-skills-that-share-a-name","label":"Skills > Resolve skills that share a name"}],
+ "diagram":{"type":"layers","items":[{"label":"Enterprise","note":"takes precedence"},"Personal","Project"],"caption":"Which skill runs when the same name exists in several locations"}},
+{"title":"You can control who invokes a skill","body":"`disable-model-invocation: true` makes a skill manual only; use it for side effects such as deploy or commit. `user-invocable: false` makes it background knowledge that only Claude can invoke.","why":"Otherwise Claude may start a workflow with side effects when it judges the moment suitable.",
+ "quotes":[{"text":"Claude can't invoke the skill on its own.","url":"https://code.claude.com/docs/en/skills#control-who-invokes-a-skill","label":"Skills > Control who invokes a skill"},{"text":"Only Claude can invoke the skill.","url":"https://code.claude.com/docs/en/skills#control-who-invokes-a-skill","label":"Skills > Control who invokes a skill"}]},
+{"title":"Invoked skill content stays in context","body":"Once invoked, the rendered content stays in the conversation as one message and is not re-read from disk. After compaction, only the first 5,000 tokens of each skill are kept.","why":"Every line has a recurring token cost. Write guidance that applies to the whole task and put the most important instructions first.",
+ "quotes":[{"text":"stays there across later turns","url":"https://code.claude.com/docs/en/skills#skill-content-lifecycle","label":"Skills > Skill content lifecycle"},{"text":"keeping the first 5,000 tokens of each","url":"https://code.claude.com/docs/en/skills#skill-content-lifecycle","label":"Skills > Skill content lifecycle"},{"text":"every line is a recurring token cost","url":"https://code.claude.com/docs/en/skills#types-of-skill-content","label":"Skills > Types of skill content"}]},
+{"title":"Dynamic context and forked subagents","body":"A line such as `!`git diff HEAD`` is replaced with the command output before Claude reads the skill. `context: fork` runs the skill in a separate subagent that has no access to the conversation history.","why":"Injected commands give Claude live data instead of guesses. Forked skills must be self-contained.",
+ "quotes":[{"text":"Claude Code runs the command and replaces the line with its output before Claude sees the skill content","url":"https://code.claude.com/docs/en/skills#create-your-first-skill","label":"Skills > Create your first skill"},{"text":"The subagent doesn't see your conversation history, so the skill's instructions have to stand on their own.","url":"https://code.claude.com/docs/en/skills#run-skills-in-a-subagent","label":"Skills > Run skills in a subagent"}]}
+],
+"skip":[
+{"title":"Bundled skills","note":"Shipped with Claude Code. A skill with the same name replaces the bundled command, but not its aliases."},
+{"title":"Nested and monorepo discovery","note":"Skills in `<subdir>/.claude/skills/` load for sessions in or below that directory."},
+{"title":"Skills from `--add-dir`","note":"Additional directories. Same-named skills run under a prefixed name."},
+{"title":"Skills synced from claude.ai","note":"Account-level skills. The folder names `synced` and `anthropic-skills` are reserved."},
+{"title":"Legacy command files","note":"`.claude/commands/*.md` still works. Prefer skills for new work."},
+{"title":"Pre-approved tools and arguments","note":"`allowed-tools` frontmatter and `$ARGUMENTS` substitution."},
+{"title":"Restricting and overriding visibility","note":"Permission deny rules and `skillOverrides` in settings."},
+{"title":"Evaluation and cleanup","note":"skill-creator evals; `/skill-doctor` to find unused skills."},
+{"title":"Description listing budget","note":"Descriptions are dropped when many skills are installed. See `skillListingBudgetFraction`."}
+],
+"practice":[
+{"title":"Create a skill that injects live context","goal":"Observe automatic loading and dynamic context injection in one skill.",
+ "steps":["Run `mkdir -p ~/.claude/skills/summarize-changes`","Save the content below as `~/.claude/skills/summarize-changes/SKILL.md`","In a git repository with uncommitted changes, ask Claude what changed. Then run `/summarize-changes` directly."],
+ "code":{"lang":"yaml","text":"---\ndescription: Summarizes uncommitted changes and flags anything risky. Use when the user asks what changed, wants a commit message, or asks to review their diff.\n---\n\n## Current changes\n\n!`git diff HEAD`\n\n## Instructions\n\nSummarize the changes above in two or three bullet points, then list any risks you notice."},
+ "check":"Claude summarizes your actual diff without you pasting it, in both cases.",
+ "variation":"Replace the description with a vague one, such as 'helps with code', and test whether it still loads automatically."},
+{"title":"Make a skill manual only","goal":"Observe the effect of disable-model-invocation.",
+ "steps":["Create `.claude/skills/deploy/SKILL.md` with a short `description` and `disable-model-invocation: true`","Ask Claude in plain language to deploy","Run `/deploy staging`"],
+ "check":"Claude does not run the skill on its own, but runs it when you type the command.",
+ "variation":"Change the field to `user-invocable: false` and confirm the `/deploy` command is no longer available to you."},
+{"title":"Move detail into a supporting file","goal":"Practise keeping SKILL.md short.",
+ "steps":["Add `reference.md` to the skill folder from exercise 1 with a list of risk categories","In `SKILL.md`, add a line: `For risk categories, see [reference.md](reference.md)`","Invoke the skill again"],
+ "check":"Claude's risk list reflects the categories in `reference.md`.",
+ "variation":"Remove the link from `SKILL.md` and compare the result."}
+],
+"gotchas":[
+"Frontmatter only counts when the opening `---` is the first line of the file. Otherwise the markers become skill content.",
+"Unrecognized frontmatter field names are ignored without an error. Match the field names exactly, hyphens included.",
+"After compaction, only the start of a skill is kept. Re-invoke the skill, or move rules that must always hold into a hook.",
+"An `allowed-tools` grant clears when you send your next message, although the skill content remains."
+],
+"cheatsheet":[
+{"term":"`~/.claude/skills/<name>/SKILL.md`","meaning":"Personal skill, all projects on this machine."},
+{"term":"`.claude/skills/<name>/SKILL.md`","meaning":"Project skill. Commit it to share with the team."},
+{"term":"`description`","meaning":"Recommended. What the skill does and when to use it."},
+{"term":"`when_to_use`","meaning":"Extra trigger phrases, appended to the description."},
+{"term":"`disable-model-invocation: true`","meaning":"Manual invocation only."},
+{"term":"`user-invocable: false`","meaning":"Only Claude can invoke the skill."},
+{"term":"`context: fork`","meaning":"Run the skill in a subagent."},
+{"term":"`allowed-tools`","meaning":"Tools pre-approved while the skill is active."}
+],
+"recall":[
+{"q":"What does Claude use to decide whether to load a skill automatically?","a":"The `description` frontmatter, plus `when_to_use` if set."},
+{"q":"The same skill name exists in personal and project locations. Which runs?","a":"The personal one."},
+{"q":"How do you prevent Claude from running a deploy skill by itself?","a":"Set `disable-model-invocation: true`."},
+{"q":"Where should large reference material go?","a":"In supporting files linked from `SKILL.md`, which should stay under 500 lines."},
+{"q":"Why might Claude stop following a skill late in a session?","a":"The content is not re-read each turn, and compaction keeps only the start. Re-invoke it or use a hook."},
+{"q":"What does a skill with `context: fork` not see?","a":"The conversation history."}
+],
+"sources":[{"title":"Extend Claude with skills","url":"https://code.claude.com/docs/en/skills"}]
+}
