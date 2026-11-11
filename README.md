@@ -1,10 +1,10 @@
-# tldr
+# utility
 
 [Claude Code](https://claude.com/claude-code) skills for reading documentation and contributing on GitHub.
 
 | Skill | What it does | Example |
 |---|---|---|
-| [`tldr-docs`](.claude/skills/tldr-docs/SKILL.md) | Turns long docs into one compact HTML study page: key concepts with verifiable quotes, exercises, pitfalls, quick reference. | `/tldr-docs https://code.claude.com/docs/en/skills` |
+| [`tldr`](.claude/skills/tldr/SKILL.md) | Turns long docs into one compact HTML study page: key concepts with verifiable quotes, exercises, pitfalls, quick reference. | `/tldr https://code.claude.com/docs/en/skills` |
 | [`gh-issue`](.claude/skills/gh-issue/SKILL.md) | Turns a complaint into a GitHub issue that follows the repository's template, after checking for duplicates. | `/gh-issue cli/cli <what went wrong>` |
 | [`gh-pr`](.claude/skills/gh-pr/SKILL.md) | Opens a pull request for the current branch, written from the diff for the reviewer. | `/gh-pr <why the change exists> #12 --draft` |
 

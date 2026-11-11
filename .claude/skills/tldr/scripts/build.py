@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render a tldr-docs bundle into one self-contained HTML file. Stdlib only.
+"""Render a tldr bundle into one self-contained HTML file. Stdlib only.
 
 Usage: build.py <bundle_dir> [-o OUT.html]
 
@@ -458,7 +458,7 @@ def lint(slug, d, src_file):
 # ---------- main ----------
 
 def main():
-    ap = argparse.ArgumentParser(description="Render a tldr-docs bundle into one HTML file.")
+    ap = argparse.ArgumentParser(description="Render a tldr bundle into one HTML file.")
     ap.add_argument("bundle", help="bundle directory containing data/ and src/")
     ap.add_argument("-o", "--out", help="output file (default: <bundle>/index.html)")
     a = ap.parse_args()

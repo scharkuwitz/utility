@@ -1,10 +1,10 @@
 ---
-name: tldr-docs
+name: tldr
 description: Turn long technical documentation into a short, practical, learn-by-doing HTML study document. Use when the user gives one or more docs URLs, a docs domain (e.g. https://code.claude.com/docs), or a tool/framework/concept name and wants a TLDR, summary, study guide, cheat sheet, or "what do I actually need to remember". Also use for "tldr this" or "summarize these docs". Separates always-remember mental models from skip-for-now details, adds hands-on exercises, and follows an overview page's key links within a fixed budget.
 argument-hint: "[docs URL(s) | domain | topic] (optional)"
 ---
 
-# tldr-docs
+# tldr
 
 Distill documentation into pages an engineer can read in about 5 minutes each and **retain**. The goal is retention and action, not compression: a shorter copy of the docs is a failure.
 
