@@ -1,0 +1,63 @@
+{
+"title":"Dynamic Workflows",
+"source_url":"https://code.claude.com/docs/en/workflows",
+"fetched":"2026-11-11",
+"one_liner":"A dynamic workflow is a script Claude writes to run many subagents in the background. The script, not Claude, holds the plan and the intermediate results.",
+"read_time_min":5,
+"core":[
+{"title":"The script holds the plan","body":"With subagents, skills and agent teams, Claude decides each next step. In a workflow, a JavaScript script does: loops, branching and intermediate results live in script variables, and only the final answer reaches Claude's context.","why":"Large jobs no longer fill the context window, and the orchestration can be read and rerun.",
+ "quotes":[{"text":"The difference is who holds the plan","url":"https://code.claude.com/docs/en/workflows#when-to-use-a-workflow","label":"Workflows > When to use a workflow"},{"text":"A workflow script holds the loop, the branching, and the intermediate results itself, so Claude's context holds only the final answer.","url":"https://code.claude.com/docs/en/workflows#when-to-use-a-workflow","label":"Workflows > When to use a workflow"}],
+ "diagram":{"type":"flow","nodes":["You describe the task","Claude writes a script","Runtime runs many subagents","One report returns"],"caption":"Workflow lifecycle"}},
+{"title":"Use one for scale or cross-checking","body":"Suited to codebase-wide audits, large migrations, research with sources checked against each other, and plans drafted from several angles. Agents can review each other's findings before reporting.","why":"For a few delegated tasks, plain subagents are cheaper and simpler.",
+ "quotes":[{"text":"Claude writes the script for the task you describe, and a runtime executes it in the background while your session stays responsive.","url":"https://code.claude.com/docs/en/workflows","label":"Workflows"}]},
+{"title":"Start one with a keyword or a bundled command","body":"Include `ultracode` in your prompt, or ask in plain words ('use a workflow'). `/deep-research <question>` is the bundled example. `/effort ultracode` makes Claude plan a workflow for every substantive task.","why":"The keyword only changes how work is structured; permission checks still apply.",
+ "quotes":[{"text":"include the keyword `ultracode` in your prompt","url":"https://code.claude.com/docs/en/workflows#ask-for-a-workflow-in-your-prompt","label":"Workflows > Ask for a workflow"},{"text":"Run `/deep-research` with a question you want investigated.","url":"https://code.claude.com/docs/en/workflows#run-a-bundled-workflow","label":"Workflows > Run a bundled workflow"}]},
+{"title":"Runs are autonomous and bounded","body":"No user input mid-run. Up to 16 concurrent agents by default and 1,000 agents per run. The script has no direct filesystem or shell access; its agents do the work. Watch and stop runs in `/workflows`.","why":"If you need sign-off between stages, run each stage as its own workflow.",
+ "quotes":[{"text":"No mid-run user input","url":"https://code.claude.com/docs/en/workflows#behavior-and-limits","label":"Workflows > Behavior and limits"},{"text":"1,000 agents total per run","url":"https://code.claude.com/docs/en/workflows#behavior-and-limits","label":"Workflows > Behavior and limits"}]},
+{"title":"Cost scales with agent count","body":"A run can use far more tokens than doing the task in conversation. Test on a small slice first. A `Large workflow` warning appears above 25 agents or 1.5 million projected tokens.","why":"Usage and rate limits apply to every agent in the run.",
+ "quotes":[{"text":"a single run can use meaningfully more tokens than working through the same task in conversation","url":"https://code.claude.com/docs/en/workflows#cost","label":"Workflows > Cost"},{"text":"run the workflow on a small slice first","url":"https://code.claude.com/docs/en/workflows#cost","label":"Workflows > Cost"}]},
+{"title":"Save a good run as a command","body":"In `/workflows`, select a run and press `s`. Save to `.claude/workflows/` (shared with the repository) or `~/.claude/workflows/` (personal). On a name clash, the project workflow runs.","why":"A repeated process, such as a branch review, then runs the same orchestration every time.",
+ "quotes":[{"text":"The workflow runs as `/<name>` in future sessions from either location.","url":"https://code.claude.com/docs/en/workflows#save-the-workflow-for-reuse","label":"Workflows > Save for reuse"}]}
+],
+"skip":[
+{"title":"Plan approval by permission mode","note":"When the approval prompt appears; `Workflow` allow rules."},
+{"title":"Prompt caching in a fan-out","note":"Matching agents share a cache prefix; `subagentPromptCacheTtl`."},
+{"title":"Resume, usage-limit waits, stalled agents","note":"Run management after interruptions."},
+{"title":"Size guideline","note":"`workflowSizeGuideline`: small, medium, large, unrestricted."},
+{"title":"Distributing workflows in plugins","note":"Ship saved workflows with a plugin."},
+{"title":"Editing saved scripts","note":"Scripts are plain JavaScript without `import()`."},
+{"title":"Turning workflows off","note":"`/config`, `disableWorkflows`, or `CLAUDE_CODE_DISABLE_WORKFLOWS=1`."}
+],
+"practice":[
+{"title":"Run the bundled workflow","goal":"See phases, agents and a single report.",
+ "steps":["Run `/deep-research What changed in the Node.js permission model between v20 and v22?`","Approve the run","Run `/workflows` and open the run to view phases"],
+ "check":"A cited report appears in your session at the end, not a turn-by-turn transcript.",
+ "variation":"Ask a narrower question and compare agent counts in `/workflows`."},
+{"title":"Commission a small workflow","goal":"Have Claude write and run a script on a small slice.",
+ "steps":["Prompt: `ultracode: audit every file under src/routes/ for missing auth checks` (limit to one directory)","Choose **View raw script** at the approval prompt and read it","Approve and watch token usage in `/workflows`"],
+ "check":"You can point to the loop in the script and the per-agent token counts.",
+ "variation":"Save the run with `s` and rerun it as `/<name>`."}
+],
+"gotchas":[
+"On Pro, workflows must be turned on in `/config` first.",
+"The `ultracode` keyword is ignored in `-p` prompts and scheduled tasks; it opts in only when you type it.",
+"A `Large workflow` warning is advisory; it does not pause or limit the run.",
+"Turning workflows off also makes ultracode unavailable."
+],
+"cheatsheet":[
+{"term":"`ultracode: <task>`","meaning":"Run one task as a workflow."},
+{"term":"`/effort ultracode`","meaning":"Plan a workflow for every substantive task."},
+{"term":"`/deep-research <q>`","meaning":"Bundled research workflow."},
+{"term":"`/workflows`","meaning":"View, stop and save runs."},
+{"term":"`.claude/workflows/`","meaning":"Saved project workflows."},
+{"term":"`~/.claude/workflows/`","meaning":"Saved personal workflows."}
+],
+"recall":[
+{"q":"What is the main difference between a workflow and subagents?","a":"The script holds the plan and intermediate results, not Claude."},
+{"q":"Can you answer questions during a run?","a":"No. Only permission prompts and usage-limit waits pause a run."},
+{"q":"How do you limit cost on a large job?","a":"Run it on a small slice first and watch per-agent usage in `/workflows`."},
+{"q":"Where are saved workflows stored?","a":"`.claude/workflows/` or `~/.claude/workflows/`."},
+{"q":"What are the default concurrency and total agent limits?","a":"16 concurrent; 1,000 per run."}
+],
+"sources":[{"title":"Orchestrate subagents at scale with dynamic workflows","url":"https://code.claude.com/docs/en/workflows"}]
+}

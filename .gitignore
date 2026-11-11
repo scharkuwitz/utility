@@ -1,1 +1,2 @@
-tldr-out/src/
+tldr-out/*/src/
+__pycache__/

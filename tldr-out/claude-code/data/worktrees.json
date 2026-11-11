@@ -1,0 +1,63 @@
+{
+"title":"Worktrees",
+"source_url":"https://code.claude.com/docs/en/worktrees",
+"fetched":"2026-11-11",
+"one_liner":"A git worktree gives each Claude Code session its own files and branch on shared history, so parallel sessions and subagents do not overwrite each other.",
+"read_time_min":4,
+"core":[
+{"title":"One session, one worktree","body":"A worktree is a separate working directory and branch that shares the repository history. Each session in its own worktree edits its own copy of the files.","why":"Two sessions editing one checkout produce conflicting changes.",
+ "quotes":[{"text":"Running each Claude Code session in its own worktree gives it a separate copy of the files to edit","url":"https://code.claude.com/docs/en/worktrees","label":"Worktrees"}]},
+{"title":"Start with --worktree","body":"`claude --worktree <name>` (or `-w`) creates `.claude/worktrees/<name>/` on a new branch `worktree-<name>` and starts the session there. You can also ask Claude to 'work in a worktree' mid-session.","why":"A single flag gives full isolation; no manual git commands are needed.",
+ "quotes":[{"text":"Pass `--worktree` or `-w` with a name to create an isolated worktree and start Claude in it.","url":"https://code.claude.com/docs/en/worktrees#start-claude-in-a-worktree","label":"Worktrees > Start Claude in a worktree"},{"text":"Add `.claude/worktrees/` to your `.gitignore` so worktree contents don't appear as untracked files in your main checkout.","url":"https://code.claude.com/docs/en/worktrees#start-claude-in-a-worktree","label":"Worktrees > Start Claude in a worktree"}],
+ "diagram":{"type":"tree","nodes":[{"label":"repo/","children":[{"label":".git/","note":"shared history"},{"label":".claude/worktrees/","children":[{"label":"feature-auth/","note":"branch worktree-feature-auth"},{"label":"bugfix/","note":"branch worktree-bugfix"}]}]}],"caption":"Default worktree layout"}},
+{"title":"A worktree is a fresh checkout","body":"Dependencies and gitignored files such as `.env` are not present. Install dependencies in the worktree, or list files to copy in a `.worktreeinclude` file.","why":"Builds and tests fail in a new worktree until the environment is set up.",
+ "quotes":[{"text":"A worktree is a fresh checkout, so initialize your development environment there","url":"https://code.claude.com/docs/en/worktrees#set-up-the-worktree-environment","label":"Worktrees > Set up the environment"}]},
+{"title":"Isolation is enforced, with a gap","body":"In a worktree session, Claude Code blocks edits, command working directories and git redirects that target the main checkout. It does not track files a shell command writes, so `cp` or a redirect into the main checkout is not blocked by these checks.","why":"Treat isolation as protection for normal edits, not a sandbox.",
+ "quotes":[{"text":"Claude Code blocks an `Edit`, `Write`, or `NotebookEdit` that targets a path in the main checkout.","url":"https://code.claude.com/docs/en/worktrees#how-claude-code-enforces-isolation","label":"Worktrees > Enforcing isolation"},{"text":"None of them tracks which files a shell command writes","url":"https://code.claude.com/docs/en/worktrees#how-claude-code-enforces-isolation","label":"Worktrees > Enforcing isolation"}]},
+{"title":"Subagents can each get a worktree","body":"Ask Claude to 'use worktrees for your agents', or add `isolation: worktree` to a subagent's frontmatter. A subagent worktree with no changes is removed automatically.","why":"Parallel subagents that edit files need the same isolation as parallel sessions.",
+ "quotes":[{"text":"by adding `isolation: worktree` to its frontmatter.","url":"https://code.claude.com/docs/en/worktrees#isolate-subagents-with-worktrees","label":"Worktrees > Isolate subagents"},{"text":"Claude Code removes automatically when the subagent finishes without changes","url":"https://code.claude.com/docs/en/worktrees#isolate-subagents-with-worktrees","label":"Worktrees > Isolate subagents"}]},
+{"title":"Some things are shared with the main checkout","body":"The `.git` directory, project-scope plugins, 'don't ask again' permission approvals, and untracked skills, agents and commands (when the worktree has none of its own).","why":"An approval granted in one worktree applies to every worktree of the repository.",
+ "quotes":[{"text":"git commands in a worktree write to the main repository's shared `.git` directory","url":"https://code.claude.com/docs/en/worktrees#what-worktrees-share-with-the-main-checkout","label":"Worktrees > What is shared"}]}
+],
+"skip":[
+{"title":"Cleanup and resume","note":"Removing worktrees on exit and resuming a worktree session."},
+{"title":"Base branch and PR branches","note":"`worktree.baseRef`, branching from a pull request."},
+{"title":"`.worktreeinclude` details","note":"Copying gitignored files into each new worktree."},
+{"title":"WorktreeCreate hook","note":"Replace worktree creation with your own logic."},
+{"title":"Non-git version control","note":"Hooks replace the git logic."},
+{"title":"Desktop app worktrees","note":"Configuration is read from the main checkout root."},
+{"title":"Troubleshooting","note":"Symlinked paths, Git LFS, partial clones, trust errors."}
+],
+"practice":[
+{"title":"Run two isolated sessions","goal":"See parallel edits on separate branches.",
+ "steps":["Add `.claude/worktrees/` to `.gitignore`","In terminal 1: `claude --worktree feature-a`","In terminal 2: `claude --worktree feature-b`","Ask each session to edit the same file differently"],
+ "check":"`git worktree list` shows both worktrees, and `git branch` shows `worktree-feature-a` and `worktree-feature-b` with separate changes.",
+ "variation":"Omit the name and note the generated one."},
+{"title":"Make a subagent always isolate","goal":"Use isolation: worktree.",
+ "steps":["Create `.claude/agents/refactorer.md` with `isolation: worktree` in the frontmatter","Ask Claude to use the refactorer for a small rename","Run `git worktree list` while it runs"],
+ "check":"A temporary worktree appears and the main checkout is unchanged.",
+ "variation":"Ask for a change that produces no diff and confirm the worktree is removed."}
+],
+"gotchas":[
+"Interactive `--worktree` runs need workspace trust; run `claude` once in the directory first.",
+"`${CLAUDE_PROJECT_DIR}` in hooks stays at the original project root after entering a worktree; read `cwd` from the hook input instead.",
+"If `permissions.blockWritesOutsideWorkingDirectories` is on, Claude has no `EnterWorktree` tool; start with `claude --worktree` instead.",
+"Worktrees require a git repository."
+],
+"cheatsheet":[
+{"term":"`claude -w <name>`","meaning":"Start a session in a new worktree."},
+{"term":"`.claude/worktrees/<name>/`","meaning":"Default worktree location."},
+{"term":"`worktree-<name>`","meaning":"Default branch name."},
+{"term":"`isolation: worktree`","meaning":"Subagent frontmatter for permanent isolation."},
+{"term":"`.worktreeinclude`","meaning":"Gitignored files to copy into new worktrees."},
+{"term":"`EnterWorktree`","meaning":"Tool Claude uses to enter a worktree mid-session."}
+],
+"recall":[
+{"q":"Where does `claude --worktree x` create the worktree?","a":"`.claude/worktrees/x/` on branch `worktree-x`."},
+{"q":"Why might tests fail in a new worktree?","a":"It is a fresh checkout without dependencies or gitignored files."},
+{"q":"Which writes to the main checkout are not blocked?","a":"Files written by shell commands such as `cp` or redirects, without git."},
+{"q":"What happens to a subagent worktree with no changes?","a":"It is removed automatically."},
+{"q":"Name two things shared with the main checkout.","a":"The `.git` directory and 'don't ask again' approvals (also project plugins and untracked skills)."}
+],
+"sources":[{"title":"Run parallel sessions with worktrees","url":"https://code.claude.com/docs/en/worktrees"}]
+}

@@ -1,0 +1,66 @@
+{
+"title":"Claude Code Plugins",
+"source_url":"https://code.claude.com/docs/en/plugins",
+"fetched":"2026-11-11",
+"one_liner":"A plugin packages skills, agents, hooks and MCP servers as one installable unit, usually distributed through a marketplace.",
+"read_time_min":4,
+"core":[
+{"title":"A plugin is a directory of components with a manifest","body":"Components can be skills, agents, hooks, a hooks module, and MCP servers. The manifest at `.claude-plugin/plugin.json` supplies the name and optional version and description.","why":"The unit of install, update and removal is the plugin, not the individual component.",
+ "quotes":[{"text":"A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components that Claude Code installs and loads as one unit.","url":"https://code.claude.com/docs/en/plugins","label":"Plugins overview"},{"text":"The manifest, a JSON file at `.claude-plugin/plugin.json`, gives the plugin its name","url":"https://code.claude.com/docs/en/plugins#understand-what-a-plugin-is","label":"Plugins > What a plugin is"}],
+ "diagram":{"type":"tree","nodes":[{"label":"my-plugin/","children":[{"label":".claude-plugin/plugin.json","note":"manifest"},{"label":"skills/review/SKILL.md","note":"skill"},{"label":"agents/reviewer.md","note":"subagent"},{"label":"hooks/hooks.json","note":"hooks"},{"label":".mcp.json","note":"MCP server"}]}],"caption":"Plugin layout shown in the docs diagram"}},
+{"title":"Use a plugin to package and share, not to enable","body":"Skills, subagents, hooks and MCP servers all work without a plugin. Make or install a plugin to move several of them together, share with teammates, or publish versioned releases.","why":"Wrapping a single personal skill in a plugin adds overhead without benefit.",
+ "quotes":[{"text":"Skills, subagents, hooks, and MCP servers all work on their own, without a plugin.","url":"https://code.claude.com/docs/en/plugins#decide-whether-you-need-a-plugin","label":"Plugins > Decide whether you need a plugin"},{"text":"Use a plugin when you want several skills, subagents, hooks, or MCP servers packaged as one unit.","url":"https://code.claude.com/docs/en/plugins#decide-whether-you-need-a-plugin","label":"Plugins > Decide whether you need a plugin"}]},
+{"title":"A marketplace is a catalog, not a store","body":"A marketplace is a repository or directory with `.claude-plugin/marketplace.json`. You add it once, then install plugins by name, for example `commit-commands@claude-plugins-official`.","why":"Adding a marketplace does not install anything; installing a plugin does.",
+ "quotes":[{"text":"A marketplace is a repository or directory with a `.claude-plugin/marketplace.json` file that lists plugins and where to fetch each one.","url":"https://code.claude.com/docs/en/plugins#get-plugins-from-a-marketplace","label":"Plugins > Get plugins from a marketplace"},{"text":"It's a catalog, not a hosted store.","url":"https://code.claude.com/docs/en/plugins#get-plugins-from-a-marketplace","label":"Plugins > Get plugins from a marketplace"}],
+ "diagram":{"type":"flow","nodes":["Marketplace lists plugin","You install the plugin","Claude Code loads its components"],"caption":"Path from marketplace to session"}},
+{"title":"Install scope decides who gets the plugin","body":"User scope: you, all projects. Project scope: everyone in the repository through the committed `.claude/settings.json`, though each person still installs it. Local scope: you, this repository only.","why":"Project scope shares the setting, not the files. Collaborators still need to install.",
+ "quotes":[{"text":"User scope: enabled for you in every project on this computer","url":"https://code.claude.com/docs/en/plugins#understand-install-scopes","label":"Plugins > Install scopes"},{"text":"Local scope: enabled for you in this repository only","url":"https://code.claude.com/docs/en/plugins#understand-install-scopes","label":"Plugins > Install scopes"}]},
+{"title":"An enabled plugin costs context in every session","body":"Names and descriptions of invocable skills, agents and commands are in context on every turn. MCP servers run alongside each session and hooks fire at their events. Disable a plugin with `/plugin` or `claude plugin disable` without uninstalling.","why":"Unused plugins still consume tokens and leave less room in the context window.",
+ "quotes":[{"text":"An enabled plugin is part of every session, not only the sessions where you use it.","url":"https://code.claude.com/docs/en/plugins#what-an-enabled-plugin-adds-to-your-sessions","label":"Plugins > What an enabled plugin adds"},{"text":"The full text of a skill or agent loads only when it's used.","url":"https://code.claude.com/docs/en/plugins#what-an-enabled-plugin-adds-to-your-sessions","label":"Plugins > What an enabled plugin adds"}]},
+{"title":"A plugin runs with your privileges","body":"Anthropic's official, community and third-party marketplaces differ by name tier, but any plugin can run code as you. Review a plugin before installing it.","why":"Official status does not remove the need to review what a plugin runs.",
+ "quotes":[{"text":"a plugin you install can run code with your user privileges.","url":"https://code.claude.com/docs/en/plugins#tell-anthropics-marketplaces-from-third-party-ones","label":"Plugins > Marketplace tiers"}]}
+],
+"skip":[
+{"title":"Mods (hooks modules)","note":"Plugins with JavaScript hooks that can also draw panes and add commands."},
+{"title":"Plugins on claude.ai and Cowork","note":"Same format; a different set of components loads there."},
+{"title":"Marketplace tiers","note":"Official, community and third-party names. See the security page."},
+{"title":"Plugin loading layers","note":"Settings, disk (`~/.claude/plugins/`) and session. See the loading reference."},
+{"title":"Organization controls","note":"Managed settings can allowlist or block marketplaces and force-install plugins."},
+{"title":"Creating and publishing","note":"Creating is summarized on the Creating a Plugin page. Marketplaces and directory submission are not covered."},
+{"title":"Evals and cost measurement","note":"`claude plugin eval` and the measurement page."},
+{"title":"Troubleshooting","note":"A dedicated page for plugins that do not load."}
+],
+"practice":[
+{"title":"Inspect your plugin setup","goal":"See the marketplace-to-session path on your machine.",
+ "steps":["Run `/plugin` in a Claude Code terminal session","Open the **Discover** tab and pick a plugin from the official marketplace","Open the plugin from the **Marketplaces** tab and read its **Context cost** estimate"],
+ "check":"You can name the marketplace, the plugin, and its estimated context cost.",
+ "variation":"Compare a plugin with several components against one with a single skill."},
+{"title":"Disable without uninstalling","goal":"Control a plugin's footprint.",
+ "steps":["Check the **Installed** tab for the **Not used recently** group","Disable one plugin with `claude plugin disable` in your shell, or in `/plugin`","Start a new session"],
+ "check":"The plugin's skills no longer appear, and the plugin is still listed as installed.",
+ "variation":"Re-enable it and reload plugins."}
+],
+"gotchas":[
+"A plugin marketplace is not Claude Marketplace, the website at claude.com/marketplace. You cannot add the website with `/plugin marketplace add`.",
+"Project-scope plugins are enabled in committed settings, but each collaborator must still install them on their own machine.",
+"Cloud sessions, including claude.ai/code, do not load the plugins in your local settings.",
+"The VS Code extension and the JetBrains plugin are not Claude Code plugins."
+],
+"cheatsheet":[
+{"term":"`/plugin`","meaning":"Browse, install and manage plugins in a terminal session."},
+{"term":"`claude plugin disable`","meaning":"Disable a plugin from the shell without uninstalling."},
+{"term":"`.claude-plugin/plugin.json`","meaning":"Plugin manifest."},
+{"term":"`.claude-plugin/marketplace.json`","meaning":"Marketplace catalog file."},
+{"term":"`name@marketplace`","meaning":"Install form, such as `commit-commands@claude-plugins-official`."},
+{"term":"`--plugin-dir`","meaning":"Load a plugin from a folder during development, without a marketplace."},
+{"term":"`~/.claude/plugins/`","meaning":"Where fetched and installed plugins are stored."}
+],
+"recall":[
+{"q":"What is a plugin?","a":"A directory of skills, agents, hooks, MCP servers or other components installed and loaded as one unit."},
+{"q":"When do you not need a plugin?","a":"When a skill, subagent, hook or MCP server on its own is enough."},
+{"q":"Does adding a marketplace install its plugins?","a":"No. A marketplace is a catalog; you install plugins from it by name."},
+{"q":"What does project scope share?","a":"The enabled setting through committed `.claude/settings.json`. Each collaborator still installs the plugin."},
+{"q":"Why can an installed but unused plugin still matter?","a":"Its descriptions are in context every turn, and its MCP servers and hooks run in each session."}
+],
+"sources":[{"title":"Plugins overview","url":"https://code.claude.com/docs/en/plugins"}]
+}
