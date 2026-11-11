@@ -1,1 +1,0 @@
-{"title":"Claude Code Docs: Summaries","source_url":"https://code.claude.com/docs","intro":"Three topics: skills; running agents in parallel (with subagents, worktrees and workflows); and plugins (with installing and creating). Overview pages come first in each group.","order":["skills","agents","sub-agents","worktrees","workflows","plugins","plugins-install","plugins-create"]}
