@@ -41,9 +41,9 @@ python3 -m py_compile .claude/skills/*/scripts/*.py
 python3 .claude/skills/tldr/scripts/build.py tldr-out/claude-code
 ```
 
-`build.py` exits non-zero on ERROR lines (broken syntax, undefined citations, missing title) and prints `WARN` lines for quality problems (quote not found or over 30 words, missing lead, infobox or self-check, oversized diagrams, emoji) and `NOTE` lines for information. For visual changes, open the built `index.html` in light and dark mode and at phone width. Run it on a copy of the bundle if you don't want to touch the committed `index.html`. The `gh-*` scripts can be smoke-tested read-only, e.g. `python3 .claude/skills/gh-issue/scripts/issue_context.py cli/cli --search "foo"` and `python3 .claude/skills/gh-pr/scripts/pr_context.py` on a topic branch.
+`build.py` exits non-zero on ERROR lines (broken syntax, undefined citations, missing title) and prints `WARN` lines for quality problems (quote not found or over 30 words, missing lead, infobox or self-check, oversized diagrams, emoji) and `NOTE` lines for information. Run it on a copy of the bundle if you don't want to touch the committed `index.html`. For visual changes, open the built `index.html` in light and dark mode and at phone width. Headless capture: `firefox --headless --no-remote --profile <dir> --window-size=1366,4000 --screenshot out.png file://<absolute path>/index.html#<page-id>`; the image always starts at the top of the document, so use a tall window to see lower sections. The `gh-*` scripts can be smoke-tested read-only, e.g. `python3 .claude/skills/gh-issue/scripts/issue_context.py cli/cli --search "foo"` and `python3 .claude/skills/gh-pr/scripts/pr_context.py` on a topic branch.
 
 ## Git
 
 - Commit subjects: sentence-case imperative ("Add gh-issue and gh-pr skills"), optional bullet body; reference issues with `Closes #N`.
-- Work on a topic branch; `main` is the PR base.
+- Work on a topic branch; `main` is the PR base. PRs are merged on GitHub with merge commits, so local `main` falls behind: `git fetch` and compare against `origin/main` before judging what a branch contains.
