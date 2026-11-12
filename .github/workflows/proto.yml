@@ -6,11 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Job triggered by ${{ github.event_name }} event."
-      - run: echo "Server: ${{ runner.os }} (runner OS)."
-      - run: echo "Repo: ${{ github.repository }}; Branch: ${{ github.ref }}"
-      - name: Checkout repository code
-        uses: actions/checkout@v6
-      - name: List files in claude skills
-        run: |
-          ls ${{ github.workspace }}/.claude/skills
-      - run: echo "Job status: ${{ job.status }}"
+      - run: echo "Server ${{ runner.os }}"
+      - run: echo "Repo ${{ github.repository }} Branch ${{ github.ref }}"
+      - uses: actions/checkout@v6
+      - run: ls ${{ github.workspace }}/.claude/skills
+      - run: echo "Job status ${{ job.status }}"
