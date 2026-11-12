@@ -1,0 +1,16 @@
+name: Prototype Action
+run-name: ${{github.actor}} testing Github Action
+on: [push]
+jobs:
+  explore-github-actions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Job triggered by ${{ github.event_name }} event."
+      - run: echo "Server: ${{ runner.os }} (runner OS)."
+      - run: echo "Repo: ${{ github.repository }}; Branch: ${{ github.ref }}"
+      - name: Checkout repository code
+        uses: actions/checkout@v6
+      - name: List files in claude skills
+        run: |
+          ls ${{ github.worksplace }}/.claude/skills
+      - run: echo "Job status: ${{ job.status }}"
