@@ -12,5 +12,5 @@ jobs:
         uses: actions/checkout@v6
       - name: List files in claude skills
         run: |
-          ls ${{ github.worksplace }}/.claude/skills
+          ls ${{ github.workspace }}/.claude/skills
       - run: echo "Job status: ${{ job.status }}"
